@@ -24,8 +24,9 @@ ActiveRecord::Schema.define(version: 20170220094517) do
     t.string   "cover_img"
     t.string   "video_url"
     t.string   "category"
-    t.string   "status_flag"
+    t.integer  "genres",        default: [],              array: true
     t.string   "screenshots",   default: [],              array: true
+    t.json     "release_dates", default: [],              array: true
     t.integer  "user_id"
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false

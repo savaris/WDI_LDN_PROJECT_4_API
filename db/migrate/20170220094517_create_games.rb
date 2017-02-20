@@ -9,8 +9,9 @@ class CreateGames < ActiveRecord::Migration[5.0]
       t.string :cover_img
       t.string :video_url
       t.string :category
-      t.string :status_flag
+      t.integer :genres, array:true, default: []
       t.string :screenshots, array:true, default: []
+      t.json :release_dates, array:true, default: []
       t.references :user, foreign_key: true
 
       t.timestamps

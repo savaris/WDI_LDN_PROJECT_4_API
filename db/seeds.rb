@@ -6,8 +6,43 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
+require "net/http"
+require "uri"
+
 [User, Game].each(&:destroy_all)
 
 u1 = User.create!(username: 'Hudhayfa', email: 'hudhayfa@hudhayfa.com', password:'password', password_confirmation: 'password')
 
-g1 = Game.create!(title: "The Witcher 3: Wild Hunt", description: "The Witcher: Wild Hunt is a story-driven, next-generation open world role-playing game set in a visually stunning fantasy universe full of meaningful choices and impactful consequences. In The Witcher you play as the professional monster hunter, Geralt of Rivia, tasked with finding a child of prophecy in a vast open world rich with merchant cities, viking pirate islands, dangerous mountain passes, and forgotten caverns to explore.", critic_rating: 91.58, time_to_beat: 258420, pegi_rating: 5, cover_img: "//images.igdb.com/igdb/image/upload/t_thumb/tri1c6vbydeosoqajwt1.png", video_url: "5nLipy-Z4yo", category: "RPG", user_id: 1, screenshots:["//images.igdb.com/igdb/image/upload/t_thumb/z5t0yuhyiiui1ickwhgj.png", "//images.igdb.com/igdb/image/upload/t_thumb/farvemmmxav0bgt6wx7t.png"], status_flag: 'played')
+uri = URI("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
+http = Net::HTTP.new(uri.host, uri.port)
+headers = {
+    'X-Mashape-Key' => "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"
+}
+path = uri.path.empty? ? "/" : uri.path
+
+#test to ensure that the request will be valid - first get the head
+code = http.head(path, headers).code.to_i
+if (code >= 200 && code < 300) then
+
+    #the data is available...
+    http.get(uri.path, headers) do |chunk|
+        #provided the data is good, print it...
+        p chunk
+    end
+end
+
+# uri = URI.parse("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
+# http = Net::HTTP.new(uri.host, uri.port).start
+# request = Net::HTTP::Get.new(uri.request_uri)
+# request.add_field("X-Mashape-Key", "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1")
+# request.add_field("Content-Type", "application/json")
+# response = http.request(request)
+
+
+      # url = URI.parse("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
+      # req = Net::HTTP::Get.new(url.path)
+      # req["X-Mashape-Key"] = "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"
+      # res = Net::HTTP.new(url.host, url.port).start do |http|
+      #   http.request(req)
+      # end
+      # p res.body
