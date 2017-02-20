@@ -8,28 +8,33 @@
 
 require "net/http"
 require "uri"
+require 'unirest'
 
 [User, Game].each(&:destroy_all)
 
 u1 = User.create!(username: 'Hudhayfa', email: 'hudhayfa@hudhayfa.com', password:'password', password_confirmation: 'password')
 
-uri = URI("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
-http = Net::HTTP.new(uri.host, uri.port)
-headers = {
-    'X-Mashape-Key' => "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"
-}
-path = uri.path.empty? ? "/" : uri.path
+search = 'zelda'
+response = Unirest.get "https://igdbcom-internet-game-database-v1.p.mashape.com/games/?limit=50&fields=*&search=#{search}",
+headers:{ "Accept" => "application/json", "X-Mashape-Key" =>  "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"} 
 
-#test to ensure that the request will be valid - first get the head
-code = http.head(path, headers).code.to_i
-if (code >= 200 && code < 300) then
-
-    #the data is available...
-    http.get(uri.path, headers) do |chunk|
-        #provided the data is good, print it...
-        p chunk
-    end
-end
+# uri = URI("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
+# http = Net::HTTP.new(uri.host, uri.port)
+# headers = {
+#     'X-Mashape-Key' => "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"
+# }
+# path = uri.path.empty? ? "/" : uri.path
+#
+# #test to ensure that the request will be valid - first get the head
+# code = http.head(path, headers).code.to_i
+# if (code >= 200 && code < 300) then
+#
+#     #the data is available...
+#     http.get(uri.path, headers) do |chunk|
+#         #provided the data is good, print it...
+#         p chunk
+#     end
+# end
 
 # uri = URI.parse("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
 # http = Net::HTTP.new(uri.host, uri.port).start
