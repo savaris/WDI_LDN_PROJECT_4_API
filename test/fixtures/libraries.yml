@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  game: one
+  played: false
+  owned: false
+
+two:
+  user: two
+  game: two
+  played: false
+  owned: false

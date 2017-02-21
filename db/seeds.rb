@@ -23,42 +23,44 @@ offset = 0
 counter = 0
 
 while looping
- response = Unirest.get "https://igdbcom-internet-game-database-v1.p.mashape.com/games/?fields=*&limit=#{limit}&offset=#{offset}", headers:{ "Accept" => "application/json", "X-Mashape-Key" =>  "7ncTKW9qAImsh7dL9r3cxpR9RyuKp1a7Pr7jsnw2XimLVmRNYf" }
+  response = Unirest.get "https://igdbcom-internet-game-database-v1.p.mashape.com/games/?fields=*&limit=#{limit}&offset=#{offset}", headers:{ "Accept" => "application/json", "X-Mashape-Key" =>  "7ncTKW9qAImsh7dL9r3cxpR9RyuKp1a7Pr7jsnw2XimLVmRNYf" }
 
- response.body.each {|game|
-   if (game['name'] && game['summary'] && game['rating'] && game['time_to_beat'] && game['pegi'] && game['cover'] && game['videos'] && game['screenshots'])
-     screenshots = []
-     platforms = []
+  response.body.each {|game|
+    if (game['name'] && game['summary'] && game['rating'] && game['time_to_beat'] && game['pegi'] && game['cover'] && game['videos'] && game['screenshots'])
+      screenshots = []
+      platforms = []
 
-     game['screenshots'].each {|screenshot|
+      game['screenshots'].each {|screenshot|
         screenshots << ('https:' + screenshot['url'].sub!('/t_thumb', ''))
-     }
+      }
 
-     game['release_dates'].each {|thing|
-       platforms << thing['platform']
-     }
+      game['release_dates'].each {|thing|
+        if !platforms.include? thing['platform']
+          platforms << thing['platform']
+        end
+      }
 
-     new_game = {
-       title: game['name'],
-       description: game['summary'] || 'Not provided.',
-       critic_rating: game['rating'] || 'Not provided',
-       time_to_beat: game['time_to_beat']['normally'] || 'Not provided.',
-       pegi_rating: game['pegi']['rating'] || 'Not provided',
-       cover_img: 'https:' + game['cover']['url'].sub!('/t_thumb', '') || 'Not provided.',
-       video_url: game['videos'][0]['video_id'] || 'Not provided.',
-       screenshots: screenshots,
-       release_date: game['first_release_date'],
-       genres: game['genres'],
-       platforms: platforms
-     }
-     Game.create!(new_game)
-     counter += 1
-     puts counter
-   end
- }
+      new_game = {
+        title: game['name'],
+        description: game['summary'] || 'Not provided.',
+        critic_rating: game['rating'] || 'Not provided',
+        time_to_beat: game['time_to_beat']['normally'] || 'Not provided.',
+        pegi_rating: game['pegi']['rating'] || 'Not provided',
+        cover_img: 'https:' + game['cover']['url'].sub!('/t_thumb', '') || 'Not provided.',
+        video_url: game['videos'][0]['video_id'] || 'Not provided.',
+        screenshots: screenshots,
+        release_date: game['first_release_date'],
+        genres: game['genres'],
+        platforms: platforms
+      }
+      Game.create!(new_game)
+      counter += 1
+      puts counter
+    end
+  }
 
- offset += limit
- if response.body.length < 50
-   looping = false
- end
+  offset += limit
+  if response.body.length < 50
+    looping = false
+  end
 end
