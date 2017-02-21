@@ -8,11 +8,10 @@ class CreateGames < ActiveRecord::Migration[5.0]
       t.integer :pegi_rating
       t.string :cover_img
       t.string :video_url
-      t.string :category
+      t.integer :release_date
       t.integer :genres, array:true, default: []
+      t.integer :platforms, array:true, default: []
       t.string :screenshots, array:true, default: []
-      t.json :release_dates, array:true, default: []
-      t.references :user, foreign_key: true
 
       t.timestamps
     end

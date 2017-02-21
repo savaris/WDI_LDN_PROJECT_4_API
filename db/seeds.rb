@@ -9,45 +9,56 @@
 require "net/http"
 require "uri"
 require 'unirest'
+require 'json'
 
 [User, Game].each(&:destroy_all)
 
 u1 = User.create!(username: 'Hudhayfa', email: 'hudhayfa@hudhayfa.com', password:'password', password_confirmation: 'password')
 
-search = 'zelda'
-response = Unirest.get "https://igdbcom-internet-game-database-v1.p.mashape.com/games/?limit=50&fields=*&search=#{search}",
-headers:{ "Accept" => "application/json", "X-Mashape-Key" =>  "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"} 
+require 'unirest'
 
-# uri = URI("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
-# http = Net::HTTP.new(uri.host, uri.port)
-# headers = {
-#     'X-Mashape-Key' => "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"
-# }
-# path = uri.path.empty? ? "/" : uri.path
-#
-# #test to ensure that the request will be valid - first get the head
-# code = http.head(path, headers).code.to_i
-# if (code >= 200 && code < 300) then
-#
-#     #the data is available...
-#     http.get(uri.path, headers) do |chunk|
-#         #provided the data is good, print it...
-#         p chunk
-#     end
-# end
+looping = true
+limit = 50
+offset = 0
+counter = 0
 
-# uri = URI.parse("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
-# http = Net::HTTP.new(uri.host, uri.port).start
-# request = Net::HTTP::Get.new(uri.request_uri)
-# request.add_field("X-Mashape-Key", "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1")
-# request.add_field("Content-Type", "application/json")
-# response = http.request(request)
+while looping
+ response = Unirest.get "https://igdbcom-internet-game-database-v1.p.mashape.com/games/?fields=*&limit=#{limit}&offset=#{offset}", headers:{ "Accept" => "application/json", "X-Mashape-Key" =>  "7ncTKW9qAImsh7dL9r3cxpR9RyuKp1a7Pr7jsnw2XimLVmRNYf" }
 
+ response.body.each {|game|
+   if (game['name'] && game['summary'] && game['rating'] && game['time_to_beat'] && game['pegi'] && game['cover'] && game['videos'] && game['screenshots'])
+     screenshots = []
+     platforms = []
 
-      # url = URI.parse("https://igdbcom-internet-game-database-v1.p.mashape.com/games/?search=witcher&fields=*")
-      # req = Net::HTTP::Get.new(url.path)
-      # req["X-Mashape-Key"] = "5N1IqU0Ln5msh2kJB8FNMmu9Ahdrp1BpIWkjsntkQAspOznbn1"
-      # res = Net::HTTP.new(url.host, url.port).start do |http|
-      #   http.request(req)
-      # end
-      # p res.body
+     game['screenshots'].each {|screenshot|
+        screenshots << ('https:' + screenshot['url'].sub!('/t_thumb', ''))
+     }
+
+     game['release_dates'].each {|thing|
+       platforms << thing['platform']
+     }
+
+     new_game = {
+       title: game['name'],
+       description: game['summary'] || 'Not provided.',
+       critic_rating: game['rating'] || 'Not provided',
+       time_to_beat: game['time_to_beat']['normally'] || 'Not provided.',
+       pegi_rating: game['pegi']['rating'] || 'Not provided',
+       cover_img: 'https:' + game['cover']['url'].sub!('/t_thumb', '') || 'Not provided.',
+       video_url: game['videos'][0]['video_id'] || 'Not provided.',
+       screenshots: screenshots,
+       release_date: game['first_release_date'],
+       genres: game['genres'],
+       platforms: platforms
+     }
+     Game.create!(new_game)
+     counter += 1
+     puts counter
+   end
+ }
+
+ offset += limit
+ if response.body.length < 50
+   looping = false
+ end
+end
