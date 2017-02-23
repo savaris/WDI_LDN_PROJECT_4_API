@@ -5,7 +5,7 @@ class CommentSerializer < ActiveModel::Serializer
 
   def comment_poster
     user = UserSerializer.new(object.user).attributes
-    p user, 'XXXXXXXXXXXXX'
+    p user, 'User'
     return {
       full_name: "#{user[:first_name]} #{user[:last_name]}",
       profile_img: user[:profile_img]
