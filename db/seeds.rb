@@ -13,9 +13,10 @@ require 'json'
 
 [User, Game].each(&:destroy_all)
 
-u1 = User.create!(username: 'Hudhayfa', email: 'hudhayfa@hudhayfa.com', password:'password', password_confirmation: 'password', first_name: 'Hudhayfa', last_name: 'Jamalkan', profile_img: 'https://fillmurray.com/200/200')
+u1 = User.create!(username: 'Phil', email: 'phil@phil.com', password:'password', password_confirmation: 'password', first_name: 'Phil', last_name: 'Murray', profile_img: 'https://fillmurray.com/200/200')
 
 u2 = User.create!(username: 'Johnnie', email: 'johnnie@johnnie.com', password:'password', password_confirmation: 'password', first_name: 'Johnnie', last_name: 'de La Moriniere', profile_img: 'https://pbs.twimg.com/profile_images/780714859700883456/E1vI9fK6_400x400.jpg')
+
 
 require 'unirest'
 
