@@ -61,7 +61,7 @@ while looping
       puts counter
     end
   }
-
+  
   offset += limit
   if response.body.length < 50
     looping = false
